@@ -474,7 +474,7 @@ export default {
       } else {
         let obj = this.formData;
         obj.phoneNum = obj.phoneNum.toString();
-        return this.formData;
+        return this.obj;
       }
     },
   },
@@ -501,13 +501,7 @@ export default {
             method: "post",
             url: "http://82.157.249.75:6789/api/post/form",
             data: this.formDatas,
-          })
-            .then((response) => {
-              console.log(response);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+          });
           for (let item in this.formData) {
             if (item == "organization1") {
               continue;
@@ -515,7 +509,6 @@ export default {
               continue;
             } else {
               this.formData[item] = "";
-              console.log(this.formData[item]);
             }
           }
         } else {
@@ -535,7 +528,9 @@ export default {
 }
 
 .main {
-  margin-top: 20px;
+  padding-top: 20px;
+  height: 100vh;
+  background: linear-gradient(rgb(231, 168, 179), rgb(241, 235, 146));
 }
 h3 {
   margin-top: 10px;

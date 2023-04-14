@@ -20,10 +20,11 @@ export default new VueRouter({
                     name: 'regist',
                     path: 'revise',
                     component: () => import('../pages/regist.vue'),
-                    props({ params: { obj, change } }) {
+                    props({ params: { obj, change, updata } }) {
                         return {
                             obj,
-                            change
+                            change,
+                            updata
                         }
                     }
                 }

@@ -177,7 +177,7 @@
 import axios from "axios";
 export default {
   name: "register",
-  props: ["obj", "change"],
+  props: ["obj", "change", "updata"],
   data() {
     return {
       value: "false",
@@ -471,8 +471,8 @@ export default {
       className: temp.className,
       organization1: {
         organizationName: temp.organizationName1 || "",
-        branch: temp.branch1,
-        reason: temp.reason1,
+        branch: temp.branch1 || "",
+        reason: temp.reason1 || "",
       },
       organization2: {
         organizationName: temp.organizationName2 || "",
@@ -481,7 +481,7 @@ export default {
       },
       isDispensing: !!temp.isDispensing,
     };
-    console.log(this.formData);
+    console.log("mounted", this.formData);
   },
   computed: {
     formDatas: function () {
@@ -495,7 +495,7 @@ export default {
       } else {
         let obj = this.formData;
         obj.phoneNum = obj.phoneNum.toString();
-        return this.formData;
+        return this.obj;
       }
     },
   },
@@ -529,15 +529,8 @@ export default {
               data: this.formDatas,
             })
               .then(() => {
-                this.$alert("提交成功", "提交成功", {
-                  confirmButtonText: "确定",
-                  callback: (action) => {
-                    this.$message({
-                      type: "info",
-                      message: `action: ${action}`,
-                    });
-                  },
-                });
+                console.log(this.formDatas);
+                this.updata();
                 this.change();
                 this.$router.back();
               })
