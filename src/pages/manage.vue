@@ -45,7 +45,14 @@
                   {{ scope.row.isDispensing === 1 ? "是" : "否" }}
                 </template>
               </el-table-column>
-              <el-table-column fixed="right" label="操作" width="120">
+              <el-table-column fixed="right" label="操作" width="140">
+                <template slot="header" slot-scope="scope">
+                  <el-input
+                    size="mini"
+                    placeholder="输入关键字搜索"
+                    v-model="search"
+                  />
+                </template>
                 <template slot-scope="scope">
                   <el-button
                     @click.native.prevent="deleteRow(scope.$index, tableData)"
@@ -105,6 +112,7 @@ export default {
       currentPage: 1,
       pageSize: 5,
       isShow: false,
+      search: "",
     };
   },
   mounted() {

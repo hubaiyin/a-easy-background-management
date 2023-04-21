@@ -461,7 +461,7 @@ export default {
     // console.log(this.obj[0]);
     let temp = JSON.stringify(this.obj[0]);
     temp = JSON.parse(temp);
-    // console.log(temp);
+    // console.log("mounted", temp);
     this.formData = {
       studentId: temp.studentId,
       name: temp.name,
@@ -494,8 +494,9 @@ export default {
         return obj;
       } else {
         let obj = this.formData;
+        // console.log("else", obj);
         obj.phoneNum = obj.phoneNum.toString();
-        return this.obj;
+        return obj;
       }
     },
   },

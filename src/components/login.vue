@@ -45,7 +45,7 @@ export default {
       //   console.log(userInfo);
       axios({
         method: "post",
-        url: "http://2022vue.katerkcl.top:6789/api/login",
+        url: "http://82.157.249.75:6789/api/login",
         data: userInfo,
       })
         .then((response) => {
