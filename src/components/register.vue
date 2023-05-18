@@ -1,176 +1,178 @@
 <template>
   <div class="main">
-    <h2>天津理工大学计算机科学与工程学院</h2>
-    <h3>学生组织报名系统</h3>
-    <div class="userInfo">
-      <el-form
-        :model="formData"
-        :rules="rules"
-        ref="formData"
-        class="demo-ruleForm regist"
-        size="mini"
-      >
-        <h4>个人信息</h4>
-        <el-form-item prop="studentId" class="input">
-          <el-input
-            v-model="formData.studentId"
-            placeholder="请输入学号"
-          ></el-input>
-        </el-form-item>
-        <el-form-item prop="name" class="input">
-          <el-input v-model="formData.name" placeholder="请输入姓名"></el-input>
-        </el-form-item>
-        <el-form-item prop="qq" class="input">
-          <el-input v-model="formData.qq" placeholder="请输入qq号"></el-input>
-        </el-form-item>
-        <el-form-item prop="phoneNum" class="input">
-          <el-input
-            v-model.number="formData.phoneNum"
-            placeholder="请输入手机号"
-          ></el-input>
-        </el-form-item>
-        <h4>专业与班级</h4>
-        <el-form-item prop="major" class="select">
-          <el-select
-            class="selectSon"
-            v-model="formData.major"
-            clearable
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="(m, index) in majorData"
-              :key="index"
-              :label="m.label"
-              :value="m.value"
-              @click.native="changeMajorIndex(index)"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item v-show="formData.major" prop="className" class="select">
-          <el-select
-            class="selectSon"
-            v-model="formData.className"
-            clearable
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="(m, index) in majorData[majorIndex].children"
-              :key="index"
-              :label="m.label"
-              :value="m.value"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <h4>第一志愿</h4>
-        <el-form-item class="select" prop="organization1.organizationName">
-          <el-select
-            class="selectSon"
-            v-model="formData.organization1.organizationName"
-            clearable
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="(m, index) in organizationData"
-              :key="index"
-              :label="m.label"
-              :value="m.value"
-              @click.native="changeOrganIndex1(index)"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          class="select"
-          prop="organization1.branch"
-          v-show="formData.organization1.organizationName"
+    <div class="box">
+      <h2>天津理工大学计算机科学与工程学院</h2>
+      <h3>学生组织报名系统</h3>
+      <div class="userInfo">
+        <el-form
+          :model="formData"
+          :rules="rules"
+          ref="formData"
+          class="demo-ruleForm regist"
+          size="mini"
         >
-          <el-select
-            class="selectSon"
-            v-model="formData.organization1.branch"
-            clearable
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="(m, index) in organizationData[organIndex1].children"
-              :key="index"
-              :label="m.label"
-              :value="m.value"
+          <h4>个人信息</h4>
+          <el-form-item prop="studentId" class="input">
+            <el-input
+              v-model="formData.studentId"
+              placeholder="请输入学号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item prop="name" class="input">
+            <el-input
+              v-model="formData.name"
+              placeholder="请输入姓名"
+            ></el-input>
+          </el-form-item>
+          <el-form-item prop="qq" class="input">
+            <el-input v-model="formData.qq" placeholder="请输入qq号"></el-input>
+          </el-form-item>
+          <el-form-item prop="phoneNum" class="input">
+            <el-input
+              v-model.number="formData.phoneNum"
+              placeholder="请输入手机号"
+            ></el-input>
+          </el-form-item>
+          <h4>专业与班级</h4>
+          <el-form-item prop="major" class="select">
+            <el-select
+              class="selectSon"
+              v-model="formData.major"
+              clearable
+              placeholder="请选择"
             >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item class="textarea" prop="organization1.reason">
-          <el-input
-            type="textarea"
-            v-model="formData.organization1.reason"
-          ></el-input>
-        </el-form-item>
-        <h4>第二志愿</h4>
-        <el-form-item class="select">
-          <el-select
-            class="selectSon"
-            v-model="formData.organization2.organizationName"
-            clearable
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="(m, index) in organizationData"
-              :key="index"
-              :label="m.label"
-              :value="m.value"
-              @click.native="changeOrganIndex2(index)"
+              <el-option
+                v-for="(m, index) in majorData"
+                :key="index"
+                :label="m.label"
+                :value="m.value"
+                @click.native="changeMajorIndex(index)"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-show="formData.major" prop="className" class="select">
+            <el-select
+              class="selectSon"
+              v-model="formData.className"
+              clearable
+              placeholder="请选择"
             >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          class="select"
-          v-show="formData.organization2.organizationName"
-        >
-          <el-select
-            class="selectSon"
-            v-model="formData.organization2.branch"
-            clearable
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="(m, index) in organizationData[organIndex2].children"
-              :key="index"
-              :label="m.label"
-              :value="m.value"
+              <el-option
+                v-for="(m, index) in majorData[majorIndex].children"
+                :key="index"
+                :label="m.label"
+                :value="m.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <h4>第一志愿</h4>
+          <el-form-item class="select" prop="organization1.organizationName">
+            <el-select
+              class="selectSon"
+              v-model="formData.organization1.organizationName"
+              clearable
+              placeholder="请选择"
             >
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item class="textarea">
-          <el-input
-            type="textarea"
-            v-model="formData.organization2.reason"
-          ></el-input>
-        </el-form-item>
-        <h4>是否调剂</h4>
-        <el-tooltip :content="'Switch value: ' + value" placement="top">
-          <el-switch
-            v-model="formData.isDispensing"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            active-value="true"
-            inactive-value="false"
+              <el-option
+                v-for="(m, index) in organizationData"
+                :key="index"
+                :label="m.label"
+                :value="m.value"
+                @click.native="changeOrganIndex1(index)"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            class="select"
+            prop="organization1.branch"
+            v-show="formData.organization1.organizationName"
           >
-          </el-switch>
-        </el-tooltip>
-        <el-form-item style="margin-top: 2vh">
-          <el-button type="primary" @click="submitForm('formData')"
-            >立即创建</el-button
+            <el-select
+              class="selectSon"
+              v-model="formData.organization1.branch"
+              clearable
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="(m, index) in organizationData[organIndex1].children"
+                :key="index"
+                :label="m.label"
+                :value="m.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item class="textarea" prop="organization1.reason">
+            <el-input
+              type="textarea"
+              v-model="formData.organization1.reason"
+            ></el-input>
+          </el-form-item>
+          <h4>第二志愿</h4>
+          <el-form-item class="select">
+            <el-select
+              class="selectSon"
+              v-model="formData.organization2.organizationName"
+              clearable
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="(m, index) in organizationData"
+                :key="index"
+                :label="m.label"
+                :value="m.value"
+                @click.native="changeOrganIndex2(index)"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            class="select"
+            v-show="formData.organization2.organizationName"
           >
-          <router-link to="login" style="margin-left: 10px">
-            <el-button>后台登录</el-button>
-          </router-link>
-        </el-form-item>
-      </el-form>
+            <el-select
+              class="selectSon"
+              v-model="formData.organization2.branch"
+              clearable
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="(m, index) in organizationData[organIndex2].children"
+                :key="index"
+                :label="m.label"
+                :value="m.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item class="textarea">
+            <el-input
+              type="textarea"
+              v-model="formData.organization2.reason"
+            ></el-input>
+          </el-form-item>
+          <h4>是否调剂</h4>
+          <el-tooltip :content="'Switch value: ' + value" placement="top">
+            <el-switch
+              v-model="formData.isDispensing"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              active-value="true"
+              inactive-value="false"
+            >
+            </el-switch>
+          </el-tooltip>
+          <el-form-item style="margin-top: 2vh">
+            <el-button type="primary" @click="submitForm('formData')"
+              >立即创建</el-button
+            >
+            <el-button @click="jump">后台登录</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
     </div>
   </div>
 </template>
@@ -483,16 +485,19 @@ export default {
       //   console.log(index);
       this.majorIndex = index;
       //   console.log(this.majorData[this.majorIndex]);
+      this.formData.className = "";
     },
     changeOrganIndex1(index) {
       //   console.log(index);
       this.organIndex1 = index;
       //   console.log(this.organizationData[this.organIndex1]);
+      this.formData.organization1.branch = "";
     },
     changeOrganIndex2(index) {
       //   console.log(index);
       this.organIndex2 = index;
       //   console.log(this.organizationData[this.organIndex2]);
+      this.formData.organization2.branch = "";
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -517,6 +522,9 @@ export default {
         }
       });
     },
+    jump() {
+      this.$router.push("login");
+    },
   },
 };
 </script>
@@ -526,11 +534,19 @@ export default {
   margin: 0;
   padding: 0;
 }
-
 .main {
-  padding-top: 20px;
-  height: 100vh;
-  background: linear-gradient(rgb(231, 168, 179), rgb(241, 235, 146));
+  height: 100%;
+  background: #0f1e33;
+  overflow: auto;
+}
+
+.main .box {
+  padding-top: 5vh;
+  height: 95vh;
+  width: 70vh;
+  margin: 0 auto;
+  /* background: #bdbbbb; */
+  color: #e4e0e0;
 }
 h3 {
   margin-top: 10px;

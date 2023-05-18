@@ -1,24 +1,46 @@
-# homework
+#### 不想写文档（因为不知道该写什么）
 
-## Project setup
-```
-npm install
+小小的吐槽：（TNND，一不小心手贱把几天前的更改给取消了，之前写的readme文档又在时间线里面找不到，所以等于白写了）
+
+​	言归正传，虽然是这么说，但确实不知道能写些什么，这个作业项目也没什么参考价值，不过基本业务逻辑都是靠自己写出来的，所以还是有一点点小小的窃喜（来自菜鸡的自我满足）。
+
+​	因为这个项目没有什么需要进行大量的数据通信的地方，所以没有用 总线 和 vuex ，但也因此在脑子犯抽了把修改数据的页面单独写成了一个组件时，对于父组件传进去的数据的处理废了好一番功夫，然后在荣哥的提醒下，对数据进行了深拷贝，避免导致在并没有真正修改时导致父组件的数据被更改了
+
+​	在专业和志愿的下拉框选项那里，因为数据对象中存在着子对象，父对象是存储在数组中的，所以我就想到了在v-for遍历时，拿取对应的index值，并设置一个方法用来将该index值存储到data数据中，这样才能在下一个  el-option中使用该index值来获取对应对象的children对象，并且为了避免在选专业或志愿之前就选择 班级或组织，导致其为空，所以我给对应的el-option组件设置了v-show，只有在专业志愿的value不为空的情况下才会显示
+
+​	修改功能那一块，个人感觉是最麻烦的，因为后端传到前端的数据格式和需要渲染在修改界面的数据格式不同，因此，就需要将其重新装进跟当初相同的对象中，并且我是使用了路由组件，所以在确定或者取消时，需要将路由跳转回上一路由，不然在下次点击时，控制台会报错（重复进入该路由）并且在地址栏那里不好看。
+
+​	插一句话，写到这里时，在vscode里面试着对该README文件进行保存，然后在时间线中出现了，可喜可贺。
+
+​	关于后端要求的鉴权问题，在网上查找了一番如何在请求头中添加 Authorization 配置后，查到了可以对axios进行一番二次封装，并书写请求拦截器，代码如下
+
+```js
+import axios from 'axios';
+
+const request = axios.create({
+    baseURL: 'http://82.157.249.75:6789',
+    timeout: 5000
+})
+
+request.interceptors.request.use((config) => {
+    if (localStorage.getItem('token')) {
+        config.headers['Authorization'] = localStorage.getItem('token')
+        // console.log(config.headers['Authorization']);
+    }
+    return config;
+})
+
+export default request;
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+​	如此实现了鉴权。
 
-### Compiles and minifies for production
-```
-npm run build
-```
+有一点，到底怎样使页面好看啊！！！没有模板自己就真的没有创作细胞啊啊啊！
 
-### Lints and fixes files
-```
-npm run lint
-```
+​	关于模糊搜索的功能，我的设想就是在搜索栏输入关键字后，并不清除，然后再对应的数据请求功能那里加if判断，如果关键字不为空，则进行模糊搜索接口，否则是正常获取数据的接口
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+整体样式布局实际上就是采用的element-ui，依靠它封装好的组件，节约了大量的时间，罐组组件实现原理，不是很清楚，稍微思考了一下el-table的实现方式，以下纯属个人理解：
+
+​	首先：el-table是一个组件这是毋庸置疑的，通过:data将数组绑定进去，然后在组件内部进行接收，组件可以可以看做一个div套着slot，slot存放的就是el-table里面的el-table-column，el-table-column，根据名称，我猜想可能是将data里面label的值和对应prop中值的属性的值拿出来拼接为数组，然后在el-table-column组件内部进行v-for渲染。
+
+​	补充，在写模糊搜索功能时，发现许多获取数据的方法都是一模一样的，所以我将其封装为 send 方法，去替换对应方法中的获取数据的功能，如此一来，大量的节省了代码量，看着就没有那么的凌乱了。

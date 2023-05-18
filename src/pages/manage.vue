@@ -1,17 +1,41 @@
 <template>
   <div class="box" style="position: realative">
     <el-container style="height: 100vh; border: 1px solid #eee">
+      <el-header style="height: 8vh" class="header">
+        <span style="font-size: 26px; color: #c5c2c2">学生信息管理</span>
+        <span style="font-size: 18px"
+          ><i class="el-icon-setting" style="margin-right: 10px"></i>
+          <span @click="logOut" class="logOut">登出</span></span
+        >
+      </el-header>
       <el-container>
-        <el-header style="height: 10vh" class="header">
-          <span style="font-size: 30px; color: #000">学生信息管理</span>
-          <span style="font-size: 18px"
-            ><i class="el-icon-setting" style="margin-right: 10px"></i>
-            <span @click="logOut" class="logOut">登出</span></span
-          >
-        </el-header>
-
+        <el-aside width="200px" style="background: #1f3a5f">
+          <el-menu style="background: #1f3a5f">
+            <el-submenu index="1">
+              <template slot="title"
+                ><i
+                  style="font-size: 26px; margin-left: -7px"
+                  class="el-icon-more-outline"
+                ></i
+              ></template>
+              <el-menu-item-group style="background: #1f3a5f">
+                <el-menu-item
+                  index="1-1"
+                  @click="changeShow"
+                  style="color: #e4e0e0"
+                  ><template slot="title">
+                    <i class="el-icon-s-grid"></i>学生信息
+                  </template></el-menu-item
+                >
+              </el-menu-item-group>
+            </el-submenu>
+          </el-menu>
+        </el-aside>
         <el-main style="padding: 4vh 3vh">
-          <div style="background: #fff; padding-left: 1vh">
+          <div
+            style="background: #fff; padding-left: 1vh; min-width: 550px"
+            v-show="show"
+          >
             <el-table :data="tableData">
               <el-table-column prop="studentId" label="学号" width="90">
               </el-table-column>
@@ -51,6 +75,7 @@
                     size="mini"
                     placeholder="输入关键字搜索"
                     v-model="search"
+                    @keyup.enter.native="searchKey"
                   />
                 </template>
                 <template slot-scope="scope">
@@ -79,7 +104,7 @@
                 :page-size="pageSize"
                 :page-sizes="[5, 10, 15, 20]"
                 layout="prev, pager, next, jumper,sizes"
-                :total="100"
+                :total="total"
               >
               </el-pagination>
             </div>
@@ -88,15 +113,15 @@
         </el-main>
       </el-container>
     </el-container>
-    <div class="revise" v-show="isShow">
-      <div class="inner">
-        <router-view></router-view>
-      </div>
-    </div>
+
+    <el-dialog :visible.sync="isShow" :close-on-click-modal="false">
+      <router-view></router-view>
+    </el-dialog>
   </div>
 </template>
 <script>
 import request from "../api/index";
+import debounce from "../myPlguin/debounce";
 export default {
   name: "manage",
   beforeRouteEnter(to, from, next) {
@@ -113,6 +138,8 @@ export default {
       pageSize: 5,
       isShow: false,
       search: "",
+      show: false,
+      total: 5,
     };
   },
   mounted() {
@@ -126,11 +153,56 @@ export default {
     })
       .then((resposne) => {
         // console.log(resposne);
-        this.tableData = resposne.data.data;
+        this.tableData = resposne.data.data.list;
+        this.total = resposne.data.data.total;
       })
       .catch((error) => {
         console.log(error);
       });
+  },
+  watch: {
+    search: {
+      handler: debounce(function () {
+        if (this.search !== "") {
+          request({
+            method: "get",
+            url: "/get/searchForm",
+            params: {
+              keyWord: this.search,
+              page: this.currentPage,
+              numPerPage: this.pageSize,
+            },
+          }).then((resposne) => {
+            let res = resposne.data.data.total / this.pageSize;
+            if (this.currentPage > Math.ceil(res)) {
+              this.$alert("该页不存在内容", "警告", {
+                confirmButtonText: "确定",
+              });
+            } else {
+              this.tableData = resposne.data.data.list;
+              this.total = resposne.data.data.total;
+            }
+          });
+        } else {
+          request({
+            method: "get",
+            url: "/get/allForm",
+            params: {
+              page: this.currentPage,
+              numPerPage: this.pageSize,
+            },
+          })
+            .then((resposne) => {
+              // console.log(resposne);
+              this.tableData = resposne.data.data.list;
+              this.total = resposne.data.data.total;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      }),
+    },
   },
   methods: {
     deleteRow(index, tableData) {
@@ -153,21 +225,11 @@ export default {
             },
           })
             .then(() => {
-              request({
-                method: "get",
-                url: "/get/allForm",
-                params: {
-                  page: this.currentPage,
-                  numPerPage: this.pageSize,
-                },
-              }).then((resposne) => {
-                this.tableData = resposne.data.data;
-              });
+              this.send();
             })
             .catch((error) => {
               console.log(error);
             });
-          console.log(res[0].studentId);
         })
         .catch(() => {
           this.$message({
@@ -179,40 +241,11 @@ export default {
     handleSizeChange(val) {
       this.currentPage = 1;
       this.pageSize = val;
-      console.log(this.pageSize);
-      request({
-        method: "get",
-        url: "/get/allForm",
-        params: {
-          page: this.currentPage,
-          numPerPage: this.pageSize,
-        },
-      })
-        .then((resposne) => {
-          console.log(resposne);
-          this.tableData = resposne.data.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.send();
     },
     getTheInfo(val) {
       this.currentPage = val;
-      request({
-        method: "get",
-        url: "/get/allForm",
-        params: {
-          page: this.currentPage,
-          numPerPage: this.pageSize,
-        },
-      })
-        .then((resposne) => {
-          // console.log(resposne);
-          this.tableData = resposne.data.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.send();
       // console.log(val);
     },
     changeIsShow() {
@@ -238,38 +271,79 @@ export default {
       });
     },
     updataForm() {
-      request({
-        method: "get",
-        url: "/get/allForm",
-        params: {
-          page: this.currentPage,
-          numPerPage: this.pageSize,
-        },
-      }).then((resposne) => {
-        console.log(resposne);
-        this.tableData = resposne.data.data;
-      });
+      this.send();
     },
-  },
-  computed: {
-    total() {
-      return this.tableData.length;
+    searchKey() {
+      this.send();
+    },
+    changeShow() {
+      if (this.show) {
+        return true;
+      }
+      this.show = true;
+    },
+    send() {
+      if (this.search !== "") {
+        request({
+          method: "get",
+          url: "/get/searchForm",
+          params: {
+            keyWord: this.search,
+            page: this.currentPage,
+            numPerPage: this.pageSize,
+          },
+        }).then((resposne) => {
+          let res = resposne.data.data.total / this.pageSize;
+          if (this.currentPage > Math.ceil(res)) {
+            this.$alert("该页不存在内容", "警告", {
+              confirmButtonText: "确定",
+            });
+          } else {
+            this.tableData = resposne.data.data.list;
+            this.total = resposne.data.data.total;
+          }
+        });
+      } else {
+        request({
+          method: "get",
+          url: "/get/allForm",
+          params: {
+            page: this.currentPage,
+            numPerPage: this.pageSize,
+          },
+        })
+          .then((resposne) => {
+            // console.log(resposne);
+            this.tableData = resposne.data.data.list;
+            this.total = resposne.data.data.total;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   },
 };
 </script>
 <style scoped>
 .el-header {
-  background-color: #b3c0d1;
-  color: #636262;
-  line-height: 10vh;
+  background-color: rgb(34, 32, 32);
+  color: #c5c2c2;
+  line-height: 8vh;
+}
+.el-aside {
+  background: #1f3a5f;
+}
+
+.el-dialog__body {
+  overflow: auto;
 }
 
 .revise {
   top: 0%;
   width: 100%;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(24, 20, 20, 0.6);
   position: absolute;
   z-index: 999;
 }
@@ -277,7 +351,7 @@ export default {
   top: 3%;
   left: 35%;
   position: absolute;
-  background: #fff;
+  background: #d4d3d3;
   padding-left: 10vh;
   padding-right: 9vh;
   padding-bottom: 2vh;

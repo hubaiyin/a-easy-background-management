@@ -158,8 +158,8 @@
             v-model="formData.isDispensing"
             active-color="#13ce66"
             inactive-color="#ff4949"
-            active-value="true"
-            inactive-value="false"
+            :active-value="true"
+            :inactive-value="false"
           >
           </el-switch>
         </el-tooltip>
@@ -176,7 +176,7 @@
 <script>
 import axios from "axios";
 export default {
-  name: "register",
+  name: "regist",
   props: ["obj", "change", "updata"],
   data() {
     return {
@@ -481,7 +481,7 @@ export default {
       },
       isDispensing: !!temp.isDispensing,
     };
-    console.log("mounted", this.formData);
+    // console.log("mounted", this.formData);
   },
   computed: {
     formDatas: function () {
@@ -521,45 +521,49 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
-      }).then(() => {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            axios({
-              method: "post",
-              url: "http://82.157.249.75:6789/api/post/form",
-              data: this.formDatas,
-            })
-              .then(() => {
-                console.log(this.formDatas);
-                this.updata();
-                this.change();
-                this.$router.back();
+      })
+        .then(() => {
+          this.$refs[formName].validate((valid) => {
+            if (valid) {
+              axios({
+                method: "post",
+                url: "http://82.157.249.75:6789/api/post/form",
+                data: this.formDatas,
               })
-              .catch(() => {
-                this.$alert("哎呀，出了点意外", "提交失败", {
-                  confirmButtonText: "确定",
-                  callback: (action) => {
-                    this.$message({
-                      type: "info",
-                      message: `action: ${action}`,
+                .then((resposne) => {
+                  if (resposne.data.status === "A0500") {
+                    this.$alert(resposne.data.message, "提交失败", {
+                      confirmButtonText: "确定",
                     });
-                  },
+                  } else {
+                    this.updata();
+                    this.change();
+                    this.$router.back();
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  this.$alert("哎呀，出了点意外", "提交失败", {
+                    confirmButtonText: "确定",
+                    callback: (action) => {
+                      this.$message({
+                        type: "info",
+                        message: `action: ${action}`,
+                      });
+                    },
+                  });
                 });
+            } else {
+              this.$alert("内容不合规，请重写", "提交失败", {
+                confirmButtonText: "确定",
               });
-          } else {
-            this.$alert("内容不合规，请重写", "提交失败", {
-              confirmButtonText: "确定",
-              callback: (action) => {
-                this.$message({
-                  type: "info",
-                  message: `action: ${action}`,
-                });
-              },
-            });
-            return false;
-          }
+              return false;
+            }
+          });
+        })
+        .catch(() => {
+          this.$alert("取消修改", "提示");
         });
-      });
     },
     cancel() {
       this.change();
@@ -577,6 +581,7 @@ export default {
 
 .main {
   margin-top: 20px;
+  overflow: auto;
 }
 h3 {
   margin-top: 10px;
@@ -588,7 +593,7 @@ h4 {
   margin-bottom: 10px;
 }
 .regist .input {
-  width: 40vh;
+  width: 60vh;
   margin: 0 auto;
   margin-bottom: 2vh;
 }
@@ -596,19 +601,18 @@ h4 {
 .regist .select {
   margin: 0 auto;
   margin-bottom: 2vh;
-  width: 40vh;
+  width: 60vh;
 }
 
 .selectSon {
-  margin: 0;
-  width: 40vh;
+  width: 60vh;
 }
 
 .regist .textarea {
   margin: 0 auto;
   margin-top: 2vh;
   margin-bottom: 2vh;
-  width: 40vh;
+  width: 60vh;
 }
 
 .footer {

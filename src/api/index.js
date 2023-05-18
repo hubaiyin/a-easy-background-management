@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const request = axios.create({
-    baseURL: 'http://82.157.249.75:6789',
+    baseURL: 'http://2022vue.katerkcl.top:6789/',
     timeout: 5000
 })
 
